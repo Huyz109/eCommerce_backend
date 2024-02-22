@@ -1,12 +1,12 @@
 'use strict'
 
-const {model, Schema, Types} = require('mongoose'); // Erase if already required
+const {model, Schema, Types} = require("mongoose"); // Erase if already required
 
 const DOCUMENT_NAME = 'Shop';
 const COLLECTION_NAME = 'Shops';
 
 // Declare the Schema of the Mongo model
-var shopSchema = new mongoose.Schema({
+var shopSchema = new Schema({
     name:{
         type:String,
         trim: true,
@@ -26,7 +26,7 @@ var shopSchema = new mongoose.Schema({
         enum: ['active', 'inactive'],
         default: 'inactive'
     },
-    vertify: {
+    verify: {
         type: Schema.Types.Boolean,
         default: false
     },
