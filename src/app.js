@@ -30,6 +30,19 @@ require('./dbs/init.mongodb')
 app.use('/', require('./routes/index'))
 
 // Handling error
+app.use((req, res, next) => {
+    const error = new Error('Not Found')
+    error.status = 404
+    next(error)
+})
 
+app.use((err, req, res, next) => {
+    const statusCode = err.status || 500
+    return res.status(statusCode).json({
+        status: 'error',
+        code: statusCode,
+        message: err.message || 'Interval Server Error'
+    })
+})
 
 module.exports = app;
