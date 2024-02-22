@@ -18,7 +18,7 @@ class AccessService {
     static signUp = async({name, email, password}) => {
         try {
             // Check email exist
-            const holderShop = await shopModel.findOne({email}).learn()
+            const holderShop = await shopModel.findOne({email}).lean()
             if (holderShop) {
                 return {
                     code: 'xxx',
@@ -30,36 +30,37 @@ class AccessService {
 
             if(newShop) {
                 // Create publicKey, privateKey
-                const {privateKey, publicKey} = crypto.generateKeyPairSync('rsa', {
-                    modulusLength: 4096,
-                    publicKeyEncoding: {
-                        type: 'pkcs1', //Public key crypto standards 1
-                        format: 'pem'
-                    },
-                    privateKeyEncoding: {
-                        type: 'pkcs1', //Public key crypto standards 1
-                        format: 'pem'
-                    }
-                })
+                // const {privateKey, publicKey} = crypto.generateKeyPairSync('rsa', {
+                //     modulusLength: 4096,
+                //     publicKeyEncoding: {
+                //         type: 'pkcs1', //Public key crypto standards 1
+                //         format: 'pem'
+                //     },
+                //     privateKeyEncoding: {
+                //         type: 'pkcs1', //Public key crypto standards 1
+                //         format: 'pem'
+                //     }
+                // })
+                const publicKey = crypto.randomBytes(64).toString('hex');
+                const privateKey = crypto.randomBytes(64).toString('hex');
 
                 console.log({publicKey, privateKey});
 
-                const publicKeyString = await KeyTokenService.createKeyToken({
+                const keyStore = await KeyTokenService.createKeyToken({
                     userId: newShop._id,
-                    publicKey
+                    publicKey,
+                    privateKey
                 });
 
-                if(!publicKeyString) {
+                if(!keyStore) {
                     return {
                         code: '',
-                        message: 'Public key string error',
+                        message: 'keyStore error',
                     }
                 }   
 
-                const publicKeyObject = crypto.createPublicKey(publicKeyString);
-
                 // Create token pair
-                const tokens = await createTokenPair({userId: newShop._id, email}, publicKeyString, privateKey)
+                const tokens = await createTokenPair({userId: newShop._id, email}, publicKey, privateKey)
                 console.log(`Create toke success: `, tokens);
 
                 return {
@@ -76,6 +77,7 @@ class AccessService {
             }
 
         } catch (error) {
+            console.error(error);
             return {
                 code: 'err',
                 message: error.message,
