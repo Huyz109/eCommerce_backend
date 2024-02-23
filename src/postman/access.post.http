@@ -3,10 +3,21 @@
 ### SignUp
 POST {{url_dev}}/shop/signup
 Content-Type: application/json
-x-api-key: abcsasasa
+x-api-key: 1adba3b5fc80fc80fdca5fbd4279a28a40ef57cf0f5b41ad2f14622b37579652b248f51fe6dedeb72def5db8e31ad71810ede365f628f177b1b64bcca1a5d1d5
 
 {
     "name": "ShopABC",
-    "email": "shopabc@gmail.com",
+    "email": "shopabcd@gmail.com",
+    "password": "123456"
+}
+
+### Login
+
+POST {{url_dev}}/shop/login
+Content-Type: application/json
+x-api-key: 1adba3b5fc80fc80fdca5fbd4279a28a40ef57cf0f5b41ad2f14622b37579652b248f51fe6dedeb72def5db8e31ad71810ede365f628f177b1b64bcca1a5d1d5
+
+{
+    "email": "shopabcd@gmail.com",
     "password": "123456"
 }
