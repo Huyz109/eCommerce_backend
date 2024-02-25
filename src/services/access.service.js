@@ -17,37 +17,6 @@ const roleShop = {
     ADMIN: 'ADMIN'
 }
 class AccessService {
-
-    static login = async({email, password, refreshToken = null}) => {
-        // Check email in database
-        const foundShop = await findByEmail({email})
-        if(!foundShop) {
-            throw new BadRequestError('Shop not registered!')
-        }
-
-        // Match password
-        const matchPassword = bcrypt.compare(password, foundShop.password)
-        if(!matchPassword) throw new AuthFailureError('Authentication error')
-
-        // Create private key and public key
-        const publicKey = crypto.randomBytes(64).toString('hex');
-        const privateKey = crypto.randomBytes(64).toString('hex'); 
-
-        // Generate tokens
-        const { _id: userId} = foundShop;
-        const tokens = await createTokenPair({userId, email}, publicKey, privateKey) 
-        await KeyTokenService.createKeyToken({
-            refreshToken: tokens.refreshToken,
-            publicKey, privateKey, userId
-        })
-
-        // Get data return login
-        return {
-            shop: getInfoData({fields: ['_id', 'name', 'email'], object: foundShop}),
-            tokens
-        }
-    }
-
     static signUp = async({name, email, password}) => {
         try {
             // Check email exist
@@ -115,6 +84,42 @@ class AccessService {
                 status: 'error'
             }
         }
+    }
+
+    static login = async({email, password, refreshToken = null}) => {
+        // Check email in database
+        const foundShop = await findByEmail({email})
+        if(!foundShop) {
+            throw new BadRequestError('Shop not registered!')
+        }
+
+        // Match password
+        const matchPassword = bcrypt.compare(password, foundShop.password)
+        if(!matchPassword) throw new AuthFailureError('Authentication error')
+
+        // Create private key and public key
+        const publicKey = crypto.randomBytes(64).toString('hex');
+        const privateKey = crypto.randomBytes(64).toString('hex'); 
+
+        // Generate tokens
+        const { _id: userId} = foundShop;
+        const tokens = await createTokenPair({userId, email}, publicKey, privateKey) 
+        await KeyTokenService.createKeyToken({
+            refreshToken: tokens.refreshToken,
+            publicKey, privateKey, userId
+        })
+
+        // Get data return login
+        return {
+            shop: getInfoData({fields: ['_id', 'name', 'email'], object: foundShop}),
+            tokens
+        }
+    }
+
+    static logout = async(keyStore) => {
+        const delKey = await KeyTokenService.removeKeyById(keyStore._id)
+        console.log({delKey})
+        return delKey
     }
 }
 

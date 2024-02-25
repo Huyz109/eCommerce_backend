@@ -1,23 +1,31 @@
 @url_dev = http://localhost:3032/v1/api/
 
 ### SignUp
-POST {{url_dev}}/shop/signup
-Content-Type: application/json
-x-api-key: 1adba3b5fc80fc80fdca5fbd4279a28a40ef57cf0f5b41ad2f14622b37579652b248f51fe6dedeb72def5db8e31ad71810ede365f628f177b1b64bcca1a5d1d5
+# POST {{url_dev}}/shop/signup
+# Content-Type: application/json
+# x-api-key: 1adba3b5fc80fc80fdca5fbd4279a28a40ef57cf0f5b41ad2f14622b37579652b248f51fe6dedeb72def5db8e31ad71810ede365f628f177b1b64bcca1a5d1d5
 
-{
-    "name": "ShopABC",
-    "email": "shopabcd@gmail.com",
-    "password": "123456"
-}
+# {
+#     "name": "ShopABC",
+#     "email": "shopabcd@gmail.com",
+#     "password": "123456"
+# }
 
 ### Login
 
-POST {{url_dev}}/shop/login
-Content-Type: application/json
-x-api-key: 1adba3b5fc80fc80fdca5fbd4279a28a40ef57cf0f5b41ad2f14622b37579652b248f51fe6dedeb72def5db8e31ad71810ede365f628f177b1b64bcca1a5d1d5
+# POST {{url_dev}}/shop/login
+# Content-Type: application/json
+# x-api-key: 1adba3b5fc80fc80fdca5fbd4279a28a40ef57cf0f5b41ad2f14622b37579652b248f51fe6dedeb72def5db8e31ad71810ede365f628f177b1b64bcca1a5d1d5
 
-{
-    "email": "shopabcd@gmail.com",
-    "password": "123456"
-}
+# {
+#     "email": "shopabcd@gmail.com",
+#     "password": "123456"
+# }
+
+# Logout
+
+POST {{url_dev}}/shop/logout
+Content-Type: application/json
+x-api-key: 48b8d5ff1294621337fd6836c19030b3bb176e5b8a061bea275080af763b49333c6b16d85131bd6406ace9f6060791b38b413256173e639e792f7c3315026b1c
+x-client-id: 65d85428c0df52ec7c564bf8
+authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NWQ4NTQyOGMwZGY1MmVjN2M1NjRiZjgiLCJlbWFpbCI6InNob3BhYmNkQGdtYWlsLmNvbSIsImlhdCI6MTcwODg0ODk0MiwiZXhwIjoxNzA5MDIxNzQyfQ.FSjPOjuLFo2IkVIELGsGjn0m_PemPDfJHqEvJGxp7zM
