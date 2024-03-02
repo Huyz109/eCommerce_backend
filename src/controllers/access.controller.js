@@ -26,6 +26,13 @@ class AccessController {
             metadata: await AccessService.logout(req.keyStore)
         }).send(res)
     }
+    handleRefreshToken = async(req, res, next) => {
+        console.log(`[P]:::refresh Token`, req.body);
+        new SuccessResponse({
+            message: 'Get token success',
+            metadata: await AccessService.handleRefreshToken(req.body.refreshToken)
+        }).send(res)
+    }
 }
 
 module.exports = new AccessController();
