@@ -122,34 +122,25 @@ class AccessService {
         return delKey
     }
 
-    static handleRefreshToken = async(refreshToken) => {
-        // Check token used ?
-        const foundToken = await KeyTokenService.findByRefreshTokenUsed(refreshToken);
-        if(foundToken) {
-            // Decode user
-            const {userId, email} = await verifyJWT(refreshToken, foundToken.privateKey);
-            console.log('[1] ',{userId, email});
-            // Delete key token
+    static handleRefreshToken = async({keyStore, user, refreshToken}) => {
+        const {userId, email} = user;
+
+        if(keyStore.refreshTokenUsed.includes(refreshToken)) {
             await KeyTokenService.deleteKeyByUserId(userId);
-            throw new ForbiddenError('Something wrong happen !! Please relogin')
+            throw new ForbiddenError('Something wrong happen !! Please relogin') 
         }
 
-        const holderToken = await KeyTokenService.findByRefreshToken(refreshToken)
-        if(!holderToken) throw new AuthFailureError('Shot not registered')
-
-        // VerifyToken
-        const {userId, email} = await verifyJWT(refreshToken, holderToken.privateKey);
-        console.log('[2] ',{userId, email});
+        if(keyStore.refreshToken !== refreshToken) throw new AuthFailureError('Shot not registered')
 
         // Check userId
         const foundShop = await findByEmail({email})
         if(!foundShop) throw new AuthFailureError('Shot not registered 2')
 
         // Create new token pair
-        const tokens = await createTokenPair({userId, email}, holderToken.publicKey, holderToken.privateKey)
+        const tokens = await createTokenPair({userId, email}, keyStore.publicKey, keyStore.privateKey)
 
         // Update token
-        await holderToken.updateOne({
+        await keyStore.updateOne({
             $set: {
                 refreshToken: tokens.refreshToken
             },
@@ -158,7 +149,7 @@ class AccessService {
             },
         })
         return {
-            user: {userId, email},
+            user,
             tokens
         }
     }

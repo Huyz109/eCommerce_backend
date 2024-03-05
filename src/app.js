@@ -41,6 +41,7 @@ app.use((err, req, res, next) => {
     return res.status(statusCode).json({
         status: 'error',
         code: statusCode,
+        stack: error.stack,
         message: err.message || 'Interval Server Error'
     })
 })
