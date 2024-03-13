@@ -1,7 +1,7 @@
 'use strict'
 
 const { Types } = require('mongoose')
-const { product, clothing, electronic, furniture } = require('../../models/product.model')
+const { product, clothing, electronic, furniture } = require('../product.model')
 const { getSelectData, unGetSelectData } = require('../../utils')
 
 const queryProduct = async({query, limit, skip}) => {

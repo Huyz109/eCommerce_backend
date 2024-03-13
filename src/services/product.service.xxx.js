@@ -3,7 +3,8 @@
 const { BadRequestError } = require('../core/error.response')
 const { product, clothing, electronic, furniture } = require('../models/product.model')
 const { removeUndefinedObject, updateNestedObjectParser } = require('../utils')
-const { publishProductByShop, queryProduct, unPublishProductByShop, searchProductByUserId, findAllProducts, findProduct, updateProductById } = require('./repositories/product.repo')
+const { publishProductByShop, queryProduct, unPublishProductByShop, searchProductByUserId, findAllProducts, findProduct, updateProductById } = require('../models/repositories/product.repo')
+const { insertInventory } = require('../models/repositories/inventory.repo')
 
 // Define Factory class
 class ProductFactory {
@@ -77,7 +78,17 @@ class Product {
     }
 
     async createProduct(product_id) {
-        return await product.create({...this, _id: product_id})
+        const newProduct =  await product.create({...this, _id: product_id})
+        if(newProduct) {
+            // Add product_stock in inventory collection
+            await insertInventory({
+                productId: newProduct._id,
+                shopId: this.product_shop,
+                stock: this.product_quantity
+            })
+
+        }
+        return newProduct
     }
 
     async updateProduct(productId, bodyUpdate) {
