@@ -23,6 +23,17 @@ class ProductController {
         }).send(res)
     }
 
+    updateProduct = async(req, res, next) => {
+        console.log(`[P]:::Update product: `, req.body);
+        new SuccessResponse({
+            message: 'Update product success !',
+            metadata: await ProductServiceV2.updateProduct(req.body.product_type, req.params.productId, {
+                ...req.body,
+                product_shop: req.user.userId
+            })
+        }).send(res)
+    }
+
     publishProductByShop = async(req, res, next) => {
         new SuccessResponse({
             message: 'Publish shop success !',
@@ -65,7 +76,23 @@ class ProductController {
     getListSearchProduct = async(req, res, next) => {
         new SuccessResponse({
             message: 'Get all product by search success !',
-            metadata: await ProductServiceV2.getListSearchProduct(req.params)
+            metadata: await ProductServiceV2.searchProducts(req.params)
+        }).send(res)
+    }
+
+    findAllProducts = async(req, res, next) => {
+        new SuccessResponse({
+            message: 'Get all product success !',
+            metadata: await ProductServiceV2.findAllProducts(req.query)
+        }).send(res)
+    }
+
+    findProductById = async(req, res, next) => {
+        new SuccessResponse({
+            message: 'Get product by id success !',
+            metadata: await ProductServiceV2.findProduct({
+                product_id: req.params.product_id
+            })
         }).send(res)
     }
 }
