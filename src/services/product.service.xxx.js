@@ -86,7 +86,6 @@ class Product {
                 shopId: this.product_shop,
                 stock: this.product_quantity
             })
-
         }
         return newProduct
     }
