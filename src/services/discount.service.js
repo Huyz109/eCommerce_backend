@@ -11,11 +11,11 @@ class DiscountService {
     static async createDiscountCode (payload) {
         const {code, start_date, end_date, isActive, shopId,
         min_order_value, productIds, applies_to, name, description,
-        type, value, max_value, max_uses, used_count, max_use_per_user} = payload
+        type, value, max_value, max_uses, used_count, users_used, max_uses_per_user} = payload
         // Check
-        if(new Date() < new Date(start_date) || new Date() > new Date(end_date)){
-            throw new BadRequestError('Discount code has expired!')
-        }
+        // if(new Date() < new Date(start_date) || new Date() > new Date(end_date)){
+        //     throw new BadRequestError('Discount code has expired!')
+        // }
 
         if(new Date(start_date) >= new Date(end_date)) throw new BadRequestError('Start date must be before end date')
 
@@ -41,7 +41,7 @@ class DiscountService {
             discount_max_uses: max_uses,
             discount_used_count: used_count,
             discount_users_used: users_used,
-            discount_max_use_per_user: max_use_per_user,
+            discount_max_uses_per_user: max_uses_per_user,
             discount_min_order_value: min_order_value || 0,
             discount_shopId: shopId,
             discount_isActive: isActive,
@@ -84,7 +84,7 @@ class DiscountService {
             })
         }
 
-        if(discount_applies_to = 'specific') {
+        if(discount_applies_to === 'specific') {
             // Get the product Id
             products = await findAllProducts({
                 filter: {
@@ -132,14 +132,19 @@ class DiscountService {
             discount_isActive, 
             discount_max_uses, 
             discount_min_order_value,
-            discount_max_use_per_user
+            discount_start_date,
+            discount_end_date,
+            discount_max_uses_per_user,
+            discount_users_used,
+            discount_type,
+            discount_value
         } = foundDiscount;
 
         if(!discount_isActive) throw new NotFoundError("Discount expired")
         if(!discount_max_uses) throw new NotFoundError('Discount are out!')
 
-        if(new Date() < new Date(discount_start_date) || new Date() > new Date(discount_end_date)) 
-            throw new NotFoundError('Discount code has been expired!')
+        // if(new Date() < new Date(discount_start_date) || new Date() > new Date(discount_end_date)) 
+        //     throw new NotFoundError('Discount code has been expired!')
 
         // 
         let totalOrder
@@ -152,7 +157,7 @@ class DiscountService {
                 throw new NotFoundError(`Discount requires a minium order value of ${discount_min_order_value}!`)
             }
         }
-        if(discount_max_use_per_user > 0) {
+        if(discount_max_uses_per_user > 0) {
             const userUseDiscount = discount_users_used.find(user => user.userId === userId)
             if(userUseDiscount) {
 

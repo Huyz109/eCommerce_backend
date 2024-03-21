@@ -30,7 +30,7 @@ class DiscountController {
         console.log(`[P]:::Get discount amount: `, req.body);
         new SuccessResponse({
             message: 'Get discount amount success !',
-            metadata: await DiscountService.createDiscountCode({
+            metadata: await DiscountService.getDiscountAmount({
                 ...req.body,
             })
         }).send(res)

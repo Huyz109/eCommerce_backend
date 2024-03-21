@@ -50,7 +50,7 @@ var discountSchema = new Schema({
         type: Array,
         required: []
     },
-    discount_max_use_per_user: {
+    discount_max_uses_per_user: {
         type: Number,
         required: true
     },

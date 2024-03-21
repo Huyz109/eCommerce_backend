@@ -9,7 +9,7 @@ const findAllDiscountCodesUnselect = async({limit = 50, page = 1, sort='ctime', 
     .sort(sortBy)
     .skip(skip)
     .limit(limit)
-    .select(unGetSelectData(select))
+    .select(unGetSelectData(unSelect))
     .lean()
 
     return documents
@@ -28,7 +28,7 @@ const findAllDiscountCodesSelect = async({limit = 50, page = 1, sort='ctime', fi
     return documents
 }
 
-const checkDiscountExists = async (model, filter) => {
+const checkDiscountExists = async ({model, filter}) => {
     return await model.findOne(filter).lean()
 }
 
