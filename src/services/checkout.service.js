@@ -1,9 +1,11 @@
 'use strict'
 
 const { BadRequestError } = require("../core/error.response")
+const orderModel = require("../models/order.model")
 const { findCartById } = require("../models/repositories/cart.repo")
 const { checkProductByServer } = require("../models/repositories/product.repo")
 const { getDiscountAmount } = require("./discount.service")
+const { acquireLock, releaseLock } = require("./redis.service")
 
 class CheckoutService {
     static async checkoutReview({cartId, userId, shop_order_ids}) {
@@ -70,6 +72,54 @@ class CheckoutService {
             checkout_order
         }
 
+    }
+
+    static async orderByUser({shop_order_ids, cartId, userId, user_address = {}, user_payment = {}}) {
+        const { shop_order_ids_new, checkout_order} = await CheckoutService.checkoutReview(cartId, userId, shop_order_ids)
+        // Check product quantity in inventory
+        const products = shop_order_ids_new.flatMap(order => order.item_products)
+        console.log('[1]:::::', products)
+        const acquireProduct = []
+        for(let i = 0; i < products.length; i++) {
+            const {productId, quantity} = products[i]
+            const keyLock = await acquireLock(productId, quantity, cartId)
+            acquireProduct.push(keyLock ? true : false)
+            if(keyLock) {
+                await releaseLock(keyLock)
+            }
+        }
+        // If product is out of stock
+        if(acquireProduct.includes(false)) throw new BadRequestError('Một số sản phẩm đã được cập nhật, vui lòng quay lại giỏ hàng ...')
+        const newOrder = orderModel.create({
+            order_userId: userId,
+            order_checkout: checkout_order,
+            order_shipping: user_address,
+            order_payment: user_payment,
+            order_products: shop_order_ids_new
+        })
+
+        // Insert done, remove all item in cart
+        if(newOrder) {
+
+        }
+
+        return newOrder
+    }
+
+    static async getOrdersByUserId = () => {
+
+    }
+
+    static async getOneOrderByUserId = () => {
+        
+    }
+
+    static async cancelOrderByUserId = () => {
+        
+    }
+
+    static async updateOrderStatusByShop = () => {
+        
     }
 }
 
