@@ -107,7 +107,7 @@ class CheckoutService {
     }
 
     static async getOrdersByUserId = () => {
-
+        console.log("Huy")
     }
 
     static async getOneOrderByUserId = () => {
