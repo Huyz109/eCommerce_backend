@@ -1,13 +1,13 @@
 'use strict'
 
-const { createCommnent } = require("../services/comment.service")
-const { SuccessResponse } = require("../core/success.response");
+const { SuccessResponse } = require("../core/success.response")
+const CommentService = require("../services/comment.service")
 
 class CommentController {
     createComment = async (req, res, next) => {
         new SuccessResponse({
-            message: "Create new comment",
-            metadata: await createCommnent(req.body)
+            message: 'Create new comment successfully!',
+            metadata: await CommentService.createCommnent(req.body)
         }).send(res)
     }
 }

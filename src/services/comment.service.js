@@ -8,6 +8,7 @@ class CommentService {
     static async createCommnent({
         productId, userId, content, parentCommentId = null
     }) {
+        // Create new comment instance
         const comment = new Comment({
             comment_productId: productId,
             comment_userId: userId,
@@ -18,13 +19,17 @@ class CommentService {
         let rightValue;
 
         if (parentCommentId) {
-            // Reply comment
+            // Handle reply to existing comment
             const parentComment = await Comment.findById(parentCommentId);
             if (!parentComment) {
                 throw new NotFoundError("Parent comment not found");
             }
+
+            // Get the right value of parent comment
             rightValue = parentComment.comment_right;
-            // UpdateMany comment
+
+            // Make space for new comment by updating existing left/right values
+            // Increment right values >= parent's right value by 2
             await Comment.updateMany({
                 comment_productId: convertToObjectId(productId),
                 comment_right: { $gte: rightValue }
@@ -32,6 +37,7 @@ class CommentService {
                 $inc: { comment_right: 2 }
             })
 
+            // Increment left values >= parent's right value by 2
             await Comment.updateMany({
                 comment_productId: convertToObjectId(productId),
                 comment_left: { $gte: rightValue }
@@ -40,6 +46,8 @@ class CommentService {
             })
         }
         else {
+            // Handle new root-level comment
+            // Find the maximum right value to append new comment at the end
             const maxRightValue = await Comment.findOne({
                 comment_productId: convertToObjectId(productId)
             }, 'comment_right', {
@@ -48,15 +56,18 @@ class CommentService {
                 }
             })
 
+            // If comments exist, place new comment at the end
+            // Otherwise start new tree with left=1, right=2
             if (maxRightValue) {
-                rightValue = maxRightValue.right + 1;
+                rightValue = maxRightValue.comment_right + 1;
             }
             else {
                 rightValue = 1
             }
         }
 
-        // Insert comment
+        // Set the left/right values for new comment
+        // In Nested Set Model, right = left + 1 for leaf nodes
         comment.comment_left = rightValue;
         comment.comment_right = rightValue + 1;
 
