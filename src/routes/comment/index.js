@@ -11,6 +11,7 @@ router.use(authenticationV2)
 
 //////////////////////////////////////
 router.post('', asyncHandler(CommentController.createComment))
+router.get('', asyncHandler(CommentController.getCommentByParentId))
 
 
 module.exports = router;
