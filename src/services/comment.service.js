@@ -2,6 +2,7 @@
 
 const { NotFoundError } = require("../core/error.response");
 const Comment = require("../models/comment.model");
+const { findProduct } = require("../models/repositories/product.repo");
 const { convertToObjectId } = require("../utils");
 
 class CommentService {
@@ -114,6 +115,52 @@ class CommentService {
         })
 
         return comments;
+    }
+
+    static async deleteComment({ commentId, productId }) {
+        // Check product in db
+        const foundProduct = await findProduct({
+            product_id: productId,
+        })
+        if (!foundProduct) throw new NotFoundError("Product not found");
+
+        const comment = await Comment.findById(commentId);
+        if (!comment) throw new NotFoundError("Comment not found");
+
+        const leftValue = comment.comment_left;
+        const rightValue = comment.comment_right;
+
+        const width = rightValue - leftValue + 1;
+
+        // Delete children comment
+        await Comment.deleteMany({
+            comment_productId: convertToObjectId(productId),
+            comment_left: {
+                $gte: leftValue,
+                $lte: rightValue
+            },
+        })
+
+        // Update other comment
+        await Comment.updateMany({
+            comment_productId: convertToObjectId(productId),
+            comment_right: { $gt: rightValue },
+        }, {
+            $inc: {
+                comment_right: -width
+            }
+        })
+
+        await Comment.updateMany({
+            comment_productId: convertToObjectId(productId),
+            comment_left: { $gt: rightValue },
+        }, {
+            $inc: {
+                comment_left: -width
+            }
+        })
+
+        return true;
     }
 }
 
