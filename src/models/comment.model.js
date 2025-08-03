@@ -2,7 +2,7 @@
 
 const { model, Schema } = require('mongoose');
 
-const DOCUMENT_NAME = 'Comments';
+const DOCUMENT_NAME = 'Comment';
 const COLLECTION_NAME = 'Comments';
 
 // Declare the Schema of the Mongo model
