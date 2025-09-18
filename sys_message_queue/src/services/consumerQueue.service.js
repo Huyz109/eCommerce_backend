@@ -18,9 +18,29 @@ const messageService = {
 
             const notiQueue = 'notificationQueue'; // assertQueue
 
+            // 1. TTL
+            // const timeExpried = 15000;
+            // setTimeout(() => {
+            //     channel.consume(notiQueue, msg => {
+            //         console.log("Send noti queue successfully: ", msg.content.toString());
+            //         channel.ack(msg);
+            //     })
+            // }, timeExpried);
+
+            // 2. Logic failed
             channel.consume(notiQueue, msg => {
-                console.log("Send noti queue successfully: ", msg.content.toString());
-                channel.ack(msg);
+                try {
+                    const numberTest = Math.random();
+
+                    if (numberTest < 0.8) {
+                        throw new Error("Send notification failed: HOT FIX")
+                    }
+                    console.log("Send noti queue successfully: ", msg.content.toString());
+                    channel.ack(msg);
+                } catch (error) {
+                    // console.error("Send notification error: ", error);
+                    channel.nack(msg, false, false);
+                }
             })
         } catch (error) {
             console.error(error);
@@ -50,7 +70,7 @@ const messageService = {
                 console.log("This notification error, please hot fix: ", msgFailed.content.toString());
             }, {
                 noAck: true
-            })  
+            })
 
         } catch (error) {
             console.error(error);
